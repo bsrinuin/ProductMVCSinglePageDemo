@@ -8,23 +8,37 @@ namespace ProductMVCSinglePageDemo.Controllers
 {
     public class HomeController : Controller
     {
+
         public ActionResult Index()
         {
-            return View();
+            TrainingProductViewModel vm = new TrainingProductViewModel();
+            vm.HandleRequest();
+
+            return View(vm);
         }
 
-        public ActionResult About()
+        [HttpPost]
+        public ActionResult Index(TrainingProductViewModel vm)
         {
-            ViewBag.Message = "Your application description page.";
+            // TrainingProductViewModel vm = new TrainingProductViewModel();
 
-            return View();
-        }
+            vm.IsValid = ModelState.IsValid;
+            vm.HandleRequest();
 
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
+            if (vm.IsValid)
+            {
+                ModelState.Clear();
+            }
+            else
+            {
+                foreach(KeyValuePair<string,string> item in vm.ValidationErrors)
+                {
+                    ModelState.AddModelError(item.Key, item.Value);
+                }
+            }
 
-            return View();
+            return View(vm);
         }
     }
+
 }
