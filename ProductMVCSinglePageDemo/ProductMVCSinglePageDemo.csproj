@@ -156,6 +156,7 @@
     <Compile Include="TrainingProduct.cs" />
     <Compile Include="TrainingProductManager.cs" />
     <Compile Include="TrainingProductViewModel.cs" />
+    <Compile Include="ViewModelBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />

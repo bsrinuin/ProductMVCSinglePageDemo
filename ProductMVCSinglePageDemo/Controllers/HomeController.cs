@@ -8,12 +8,10 @@ namespace ProductMVCSinglePageDemo.Controllers
 {
     public class HomeController : Controller
     {
-
         public ActionResult Index()
         {
             TrainingProductViewModel vm = new TrainingProductViewModel();
             vm.HandleRequest();
-
             return View(vm);
         }
 
@@ -21,7 +19,6 @@ namespace ProductMVCSinglePageDemo.Controllers
         public ActionResult Index(TrainingProductViewModel vm)
         {
             // TrainingProductViewModel vm = new TrainingProductViewModel();
-
             vm.IsValid = ModelState.IsValid;
             vm.HandleRequest();
 
@@ -31,12 +28,11 @@ namespace ProductMVCSinglePageDemo.Controllers
             }
             else
             {
-                foreach(KeyValuePair<string,string> item in vm.ValidationErrors)
+                foreach (KeyValuePair<string, string> item in vm.ValidationErrors)
                 {
                     ModelState.AddModelError(item.Key, item.Value);
                 }
             }
-
             return View(vm);
         }
     }

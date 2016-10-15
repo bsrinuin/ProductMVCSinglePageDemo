@@ -4,151 +4,96 @@ using System.Linq;
 using System.Web;
 using ProductMVCSinglePageDemo;
 
-
 namespace ProductMVCSinglePageDemo
 {
-    public class TrainingProductViewModel
+    public class TrainingProductViewModel : ViewModelBase
     {
-
-
-        public TrainingProductViewModel()
+        public TrainingProductViewModel() : base()
         {
-            init();
+            // init();
+        }
+
+        //Step1
+        public List<TrainingProduct> Products { get; set; }
+        //Step3 - Creating for Search functionality implementation
+        public TrainingProduct SearchEntity { get; set; }
+        public TrainingProduct Entity { get; set; }
+
+        protected override void init()
+        {
+            base.init();
+
             Products = new List<TrainingProduct>();
             SearchEntity = new TrainingProduct();
             Entity = new TrainingProduct();
         }
 
-        //step2
-        public string EventCommand { get; set; }
-        //Step1
-        public List<TrainingProduct> Products { get; set; }
-        //Step3 - Creating for Search functionality implementation
-        public TrainingProduct SearchEntity { get; set; }
-
-        public bool IsDetailAreaVisible { get; set; }
-        public bool IsListAreaVisible { get; set; }
-        public bool IsSearchAreaVisible { get; set; }
-
-        public TrainingProduct Entity { get; set; }
-        public Boolean IsValid { get; set; }
-        public string Mode { get; set; }
-
-        public List<KeyValuePair<String, String>> ValidationErrors { get; set; }
-
-
-        private void init()
-        {
-            listmode();
-
-            ValidationErrors = new List<KeyValuePair<String, String>>();
-
-            EventCommand = "List";
-
-        }
-
-        private void listmode()
+        protected override void Add()
         {
             IsValid = true;
-
-            IsListAreaVisible = true;
-            IsSearchAreaVisible = true;
-            IsDetailAreaVisible = false;
-
-            Mode = "List";
-        }
-
-        private void Add()
-        {
-            IsValid = true;
-
             Entity = new TrainingProduct();
             Entity.Introductiondate = DateTime.Now;
             Entity.Url = "http://";
             Entity.Price = 0;
 
-            Addmode();
+            base.Add();
         }
 
-        private void Addmode()
+        protected override void Edit()
         {
-            IsListAreaVisible = false;
-            IsSearchAreaVisible = false;
-            IsDetailAreaVisible = true;
+            TrainingProductManager mgr = new TrainingProductManager();
 
-            Mode = "Add";
+            //Entity holds the current ProductID
+            Entity = mgr.Get(Convert.ToInt32(EventArgument));
+            // Entity = mgr.Get(Convert.ToInt32("6"));
+
+            //Set to Edit view Mode
+            base.Edit();
         }
 
-        private void ResetSearch()
+        protected override void Delete()
+        {
+            TrainingProductManager mgr = new TrainingProductManager();
+            Entity = new TrainingProduct();
+            Entity.ProductID = Convert.ToInt32(EventArgument);
+            mgr.Delete(Entity);
+
+            Get();
+            base.Delete();
+        }
+
+        protected override void ResetSearch()
         {
             SearchEntity = new TrainingProduct();
+            base.ResetSearch();
         }
 
-        private void Get()
+        protected override void Get()
         {
             TrainingProductManager mgr = new TrainingProductManager();
             Products = mgr.Get(SearchEntity);
+            base.Get();
         }
 
-        private void Save()
+        protected override void Save()
         {
             TrainingProductManager mgr = new TrainingProductManager();
-
             if (Mode == "Add")
             {
                 mgr.Insert(Entity);
             }
-
+            else //Edit mode
+            {
+                mgr.Update(Entity);
+            }
             ValidationErrors = mgr.ValidationErrors;
 
-            if(ValidationErrors.Count>0)
-            {
-                IsValid = false;
-            }
-
-            if (!IsValid)
-            {
-                if (Mode == "Add")
-                {
-                    Addmode();
-                }
-            }
+            base.Save();
         }
 
-        public void HandleRequest()
+        public override void HandleRequest()
         {
-            switch (EventCommand.ToLower())
-            {
-                case "list":
-                case "search":
-                    Get();
-                    break;
-
-                case "resetsearch":
-                    ResetSearch();
-                    Get();
-                    break;
-
-                case "add":
-                    Add();
-                    break;
-
-                case "cancel":
-                    listmode();
-                    Get();
-                    break;
-
-                case "save":
-                    Save();
-                    if (IsValid)
-                    {
-                        Get();
-                    }
-                    break;
-
-                default:
-                    break;
-            }
+            base.HandleRequest();
         }
 
     }
